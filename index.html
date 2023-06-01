@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <title>unixy2k countdown</title>
+</head>
+<body class="min-h-screen flex flex-col justify-center items-center">
+  <div class="container mx-auto text-center">
+    <h1 class="text-4xl font-bold mt-4">Real-time UTC Date</h1>
+    <p id="current-date" class="text-lg mt-4"></p>
+    <p id="epoch-time" class="text-lg mt-2"></p>
+    <p id="epoch-binary" class="text-lg mt-2"></p>
+  </div>
+
+  <div class="container mx-auto text-center mt-8">
+    <h2 class="text-2xl font-bold">Remaining Time</h2>
+    <p id="remaining-time" class="text-lg mt-2"></p>
+  </div>
+  <script>
+    function updateDate() {
+      const currentDate = new Date();
+      const utcDate = currentDate.toISOString().slice(0, 19).replace('T', ' '); 
+      const epochTime = Math.floor(currentDate.getTime() / 1000); 
+      const binaryString = epochTime.toString(2); 
+      const binaryChunks = binaryString.match(/.{1,8}/g);
+      const paddedBinaryChunks = binaryChunks.map(chunk => chunk.padStart(8, '0'));
+
+      document.getElementById("current-date").textContent = "Date: " + utcDate;
+      document.getElementById("epoch-time").textContent = "Epoch Time: " + epochTime;
+      document.getElementById("epoch-binary").textContent = "Binary: " + paddedBinaryChunks.join(" ");
+
+      const targetDate = new Date("2038-01-19T03:14:07Z").getTime() / 1000;
+      const remainingTime = targetDate - epochTime;
+
+      const years = Math.floor(remainingTime / (365 * 24 * 60 * 60));
+      const months = Math.floor((remainingTime % (365 * 24 * 60 * 60)) / (30 * 24 * 60 * 60));
+      const days = Math.floor((remainingTime % (30 * 24 * 60 * 60)) / (24 * 60 * 60));
+      const hours = Math.floor((remainingTime % (24 * 60 * 60)) / (60 * 60));
+      const minutes = Math.floor((remainingTime % (60 * 60)) / 60);
+      const seconds = Math.floor(remainingTime % 60);
+
+      const remainingTimeString = `${years} years, ${months} months, ${days} days, ${hours} hours, ${minutes} minutes, ${seconds} seconds`;
+      document.getElementById("remaining-time").textContent = remainingTimeString;
+    }
+
+    setInterval(updateDate, 10);
+  </script>
+</body>
+</html>
