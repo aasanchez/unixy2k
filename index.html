@@ -58,33 +58,41 @@
       </ul>
     </footer>
     <script>
-      function updateDate() {
-        const currentDate = new Date();
-        const utcDate = currentDate.toISOString().slice(0, 19).replace('T', ' '); 
-        const epochTime = Math.floor(currentDate.getTime() / 1000); 
-        const binaryString = "0" + epochTime.toString(2); 
-        const binaryChunks = binaryString.match(/.{1,8}/g);
-        const paddedBinaryChunks = binaryChunks.map(chunk => chunk.padStart(8, '0'));
+function updateDate() {
+    const currentDate = new Date();
+    const utcDate = currentDate.toISOString().slice(0, 19).replace('T', ' ');
+    const epochTime = Math.floor(currentDate.getTime() / 1000);
+    const binaryString = "0" + epochTime.toString(2);
+    const binaryChunks = binaryString.match(/.{1,8}/g);
+    
+    // Assuming the binary chunks are already 8 bits, no need to pad them again
+    const paddedBinaryChunks = binaryChunks.map(chunk => chunk.padStart(8, '0'));
+  
+    document.getElementById("current-date").textContent = "Date: " + utcDate;
+    document.getElementById("epoch-time").textContent = "Epoch Time: " + epochTime;
+    document.getElementById("epoch-binary").textContent = "Binary: " + paddedBinaryChunks.join(" ");
+  
+    const targetDate = new Date("2038-01-19T03:14:07Z").getTime() / 1000;
+    const remainingTime = targetDate - epochTime;
+  
+    const secondsInMinute = 60;
+    const secondsInHour = secondsInMinute * 60;
+    const secondsInDay = secondsInHour * 24;
+    const secondsInYear = secondsInDay * 365.25; // Account for leap years
+    const secondsInMonth = secondsInYear / 12;
+  
+    const years = Math.floor(remainingTime / secondsInYear);
+    const months = Math.floor((remainingTime % secondsInYear) / secondsInMonth);
+    const days = Math.floor((remainingTime % secondsInMonth) / secondsInDay);
+    const hours = Math.floor((remainingTime % secondsInDay) / secondsInHour);
+    const minutes = Math.floor((remainingTime % secondsInHour) / secondsInMinute);
+    const seconds = Math.floor(remainingTime % secondsInMinute);
+  
+    const remainingTimeString = `${years} years, ${months} months, ${days} days, ${hours} hours, ${minutes} minutes, ${seconds} seconds`;
+    document.getElementById("remaining-time").textContent = remainingTimeString;
+}
       
-        document.getElementById("current-date").textContent = "Date: " + utcDate;
-        document.getElementById("epoch-time").textContent = "Epoch Time: " + epochTime;
-        document.getElementById("epoch-binary").textContent = "Binary: " + paddedBinaryChunks.join(" ");
-      
-        const targetDate = new Date("2038-01-19T03:14:07Z").getTime() / 1000;
-        const remainingTime = targetDate - epochTime;
-      
-        const years = Math.floor(remainingTime / (365 * 24 * 60 * 60));
-        const months = Math.floor((remainingTime % (365 * 24 * 60 * 60)) / (30 * 24 * 60 * 60));
-        const days = Math.floor((remainingTime % (30 * 24 * 60 * 60)) / (24 * 60 * 60));
-        const hours = Math.floor((remainingTime % (24 * 60 * 60)) / (60 * 60));
-        const minutes = Math.floor((remainingTime % (60 * 60)) / 60);
-        const seconds = Math.floor(remainingTime % 60);
-      
-        const remainingTimeString = `${years} years, ${months} months, ${days} days, ${hours} hours, ${minutes} minutes, ${seconds} seconds`;
-        document.getElementById("remaining-time").textContent = remainingTimeString;
-      }
-      
-      setInterval(updateDate, 10);
+      setInterval(updateDate, 100);
     </script>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7798997524767068" crossorigin="anonymous"></script>
     <!-- Google tag (gtag.js) -->
