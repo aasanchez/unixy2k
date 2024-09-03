@@ -58,40 +58,43 @@
       </ul>
     </footer>
     <script>
-function updateDate() {
-    const currentDate = new Date();
-    const utcDate = currentDate.toISOString().slice(0, 19).replace('T', ' ');
-    const epochTime = Math.floor(currentDate.getTime() / 1000);
-    const binaryString = "0" + epochTime.toString(2);
-    const binaryChunks = binaryString.match(/.{1,8}/g);
-    
-    // Assuming the binary chunks are already 8 bits, no need to pad them again
-    const paddedBinaryChunks = binaryChunks.map(chunk => chunk.padStart(8, '0'));
-  
-    document.getElementById("current-date").textContent = "Date: " + utcDate;
-    document.getElementById("epoch-time").textContent = "Epoch Time: " + epochTime;
-    document.getElementById("epoch-binary").textContent = "Binary: " + paddedBinaryChunks.join(" ");
-  
-    const targetDate = new Date("2038-01-19T03:14:07Z").getTime() / 1000;
-    const remainingTime = targetDate - epochTime;
-  
-    const secondsInMinute = 60;
-    const secondsInHour = secondsInMinute * 60;
-    const secondsInDay = secondsInHour * 24;
-    const secondsInYear = secondsInDay * 365.25; // Account for leap years
-    const secondsInMonth = secondsInYear / 12;
-  
-    const years = Math.floor(remainingTime / secondsInYear);
-    const months = Math.floor((remainingTime % secondsInYear) / secondsInMonth);
-    const days = Math.floor((remainingTime % secondsInMonth) / secondsInDay);
-    const hours = Math.floor((remainingTime % secondsInDay) / secondsInHour);
-    const minutes = Math.floor((remainingTime % secondsInHour) / secondsInMinute);
-    const seconds = Math.floor(remainingTime % secondsInMinute);
-  
-    const remainingTimeString = `${years} years, ${months} months, ${days} days, ${hours} hours, ${minutes} minutes, ${seconds} seconds`;
-    document.getElementById("remaining-time").textContent = remainingTimeString;
-}
-      
+      function updateDate() {
+        const currentDate = new Date();
+        const utcDate = currentDate.toISOString().slice(0, 19).replace('T', ' ');
+        const epochTime = Math.floor(currentDate.getTime() / 1000);
+
+        // Convert epoch time to a binary string and split into 8-bit chunks
+        const binaryString = epochTime.toString(2).padStart(32, '0'); // Ensures at least 32 bits
+        const binaryChunks = binaryString.match(/.{1,8}/g);
+
+        // Update the date, epoch time, and binary representation in the document
+        document.getElementById("current-date").textContent = `Date: ${utcDate}`;
+        document.getElementById("epoch-time").textContent = `Epoch Time: ${epochTime}`;
+        document.getElementById("epoch-binary").textContent = `Binary: ${binaryChunks.join(' ')}`;
+
+        // Calculate the remaining time until 2038-01-19 03:14:07 UTC
+        const targetDateEpoch = 2147483647; // Pre-calculated epoch time for 2038-01-19T03:14:07Z
+        const remainingTime = targetDateEpoch - epochTime;
+
+        // Time units in seconds
+        const secondsInMinute = 60;
+        const secondsInHour = 60 * secondsInMinute;
+        const secondsInDay = 24 * secondsInHour;
+        const secondsInYear = 365.25 * secondsInDay; // Account for leap years
+        const secondsInMonth = secondsInYear / 12;
+
+        // Calculate remaining time in years, months, days, hours, minutes, and seconds
+        const years = Math.floor(remainingTime / secondsInYear);
+        const months = Math.floor((remainingTime % secondsInYear) / secondsInMonth);
+        const days = Math.floor((remainingTime % secondsInMonth) / secondsInDay);
+        const hours = Math.floor((remainingTime % secondsInDay) / secondsInHour);
+        const minutes = Math.floor((remainingTime % secondsInHour) / secondsInMinute);
+        const seconds = remainingTime % secondsInMinute;
+
+        // Format and update the remaining time in the document
+        const remainingTimeString = `${years} years, ${months} months, ${days} days, ${hours} hours, ${minutes} minutes, ${seconds} seconds`;
+        document.getElementById("remaining-time").textContent = remainingTimeString;
+      }
       setInterval(updateDate, 100);
     </script>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7798997524767068" crossorigin="anonymous"></script>
