@@ -24,7 +24,7 @@
     <meta name="msapplication-TileColor" content="#ffffff">
     <meta name="msapplication-TileImage" content="img/ms-icon-144x144.png">
     <meta name="theme-color" content="#ffffff">
-    <link rel="icon" href="imgfavicon.ico" type="image/x-icon">
+    <link rel="icon" href="img/favicon.ico" type="image/x-icon">
     <style>
       body{
         font-family: 'Source Code Pro', monospace;
@@ -73,23 +73,27 @@
         document.getElementById("epoch-binary").textContent = `Binary: ${binaryChunks.join(' ')}`;
 
         // Calculate the remaining time until 2038-01-19 03:14:07 UTC
-        const targetDateEpoch = 2147483647; // Pre-calculated epoch time for 2038-01-19T03:14:07Z
-        const remainingTime = targetDateEpoch - epochTime;
+        const targetDate = new Date(Date.UTC(2038, 0, 19, 3, 14, 7));
 
-        // Time units in seconds
-        const secondsInMinute = 60;
-        const secondsInHour = 60 * secondsInMinute;
-        const secondsInDay = 24 * secondsInHour;
-        const secondsInYear = 365.25 * secondsInDay; // Account for leap years
-        const secondsInMonth = secondsInYear / 12;
+        // Use Date differencing for accurate year/month/day breakdown
+        let years = targetDate.getUTCFullYear() - currentDate.getUTCFullYear();
+        let months = targetDate.getUTCMonth() - currentDate.getUTCMonth();
+        let days = targetDate.getUTCDate() - currentDate.getUTCDate();
+        let hours = targetDate.getUTCHours() - currentDate.getUTCHours();
+        let minutes = targetDate.getUTCMinutes() - currentDate.getUTCMinutes();
+        let seconds = targetDate.getUTCSeconds() - currentDate.getUTCSeconds();
 
-        // Calculate remaining time in years, months, days, hours, minutes, and seconds
-        const years = Math.floor(remainingTime / secondsInYear);
-        const months = Math.floor((remainingTime % secondsInYear) / secondsInMonth);
-        const days = Math.floor((remainingTime % secondsInMonth) / secondsInDay);
-        const hours = Math.floor((remainingTime % secondsInDay) / secondsInHour);
-        const minutes = Math.floor((remainingTime % secondsInHour) / secondsInMinute);
-        const seconds = remainingTime % secondsInMinute;
+        // Borrow from larger units when a value is negative
+        if (seconds < 0) { seconds += 60; minutes--; }
+        if (minutes < 0) { minutes += 60; hours--; }
+        if (hours < 0) { hours += 24; days--; }
+        if (days < 0) {
+          // Borrow a month: get the number of days in the previous month
+          const prevMonth = new Date(Date.UTC(currentDate.getUTCFullYear(), currentDate.getUTCMonth() + 1, 0));
+          days += prevMonth.getUTCDate();
+          months--;
+        }
+        if (months < 0) { months += 12; years--; }
 
         // Format and update the remaining time in the document
         const remainingTimeString = `${years} years, ${months} months, ${days} days, ${hours} hours, ${minutes} minutes, ${seconds} seconds`;
