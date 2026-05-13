@@ -88,8 +88,7 @@
         if (minutes < 0) { minutes += 60; hours--; }
         if (hours < 0) { hours += 24; days--; }
         if (days < 0) {
-          // Borrow a month: get the number of days in the previous month
-          const prevMonth = new Date(Date.UTC(currentDate.getUTCFullYear(), currentDate.getUTCMonth() + 1, 0));
+          const prevMonth = new Date(Date.UTC(currentDate.getUTCFullYear(), currentDate.getUTCMonth() + months + 1, 0));
           days += prevMonth.getUTCDate();
           months--;
         }
@@ -99,6 +98,7 @@
         const remainingTimeString = `${years} years, ${months} months, ${days} days, ${hours} hours, ${minutes} minutes, ${seconds} seconds`;
         document.getElementById("remaining-time").textContent = remainingTimeString;
       }
+      updateDate();
       setInterval(updateDate, 100);
     </script>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7798997524767068" crossorigin="anonymous"></script>
